@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Ishu 💖</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#ff4e8a,#ffb6c1);
+    font-family:Arial, sans-serif;
+    overflow:hidden;
+    text-align:center;
+    color:#fff;
+}
+
+/* Card */
+.card{
+    background:white;
+    color:#333;
+    padding:30px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    z-index:2;
+    max-width:320px;
+}
+
+/* Photo */
+.photo{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+    border:4px solid #ff2e63;
+}
+
+/* Buttons */
+button{
+    padding:10px 20px;
+    margin:10px;
+    border:none;
+    border-radius:25px;
+    font-size:16px;
+    cursor:pointer;
+}
+.yes{ background:#ff2e63; color:white; }
+.no{ background:#333; color:white; position:absolute; }
+
+/* Floating hearts */
+.heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:20px;
+    animation:floatUp 6s linear infinite;
+}
+@keyframes floatUp{
+    0%{transform:translateY(0); opacity:1;}
+    100%{transform:translateY(-110vh); opacity:0;}
+}
+
+/* Lyrics */
+#lyrics{
+    position:fixed;
+    bottom:20px;
+    width:100%;
+    font-size:18px;
+    font-weight:bold;
+    animation:fade 3s infinite;
+}
+@keyframes fade{
+    0%,100%{opacity:0;}
+    50%{opacity:1;}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop>
+    <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<div class="card">
+    <img src="photo.jpg" class="photo" alt="Ishu">
+    <h2>Ishu, Will You Be My Valentine? 💖</h2>
+    <p>You make my world beautiful ❤️</p>
+    <p><strong>— Uphar</strong></p>
+
+    <button class="yes" onclick="startLove()">Yes 💘</button>
+    <button class="no" id="noBtn">No 😜</button>
+</div>
+
+<div id="lyrics"></div>
+
+<script>
+// NO button move
+const noBtn = document.getElementById("noBtn");
+noBtn.addEventListener("mouseover", () => {
+    noBtn.style.left = Math.random()*window.innerWidth + "px";
+    noBtn.style.top = Math.random()*window.innerHeight + "px";
+});
+
+// Start everything on YES
+function startLove(){
+    document.getElementById("bgMusic").play();
+    showLyrics();
+}
+
+// Floating hearts
+setInterval(()=>{
+    const heart=document.createElement("div");
+    heart.className="heart";
+    heart.style.left=Math.random()*100+"vw";
+    heart.innerText="💖";
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),6000);
+},300);
+
+// Lyrics animation
+const lines=[
+"Tenu dil da vaasta ❤️",
+"Tu meri jaan ban ja 💖",
+"Bin tere lagda na jee 🥹",
+"Ishu... be my Valentine 💘"
+];
+let i=0;
+function showLyrics(){
+    setInterval(()=>{
+        document.getElementById("lyrics").innerText=lines[i%lines.length];
+        i++;
+    },3000);
+}
+</script>
+
+</body>
+</html>
