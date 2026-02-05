@@ -27,16 +27,28 @@ body{
     border-radius:20px;
     box-shadow:0 10px 30px rgba(0,0,0,0.2);
     z-index:2;
-    max-width:320px;
+    max-width:360px;
+    position:relative;
 }
 
 /* Photo */
 .photo{
-    width:100px;
-    height:100px;
+    width:120px;
+    height:120px;
     border-radius:50%;
     object-fit:cover;
     border:4px solid #ff2e63;
+    display:block;
+    margin:0 auto 10px;
+}
+
+/* Inputs */
+.inputs{
+    margin-top:8px;
+}
+input[type="file"]{
+    display:block;
+    margin:6px auto;
 }
 
 /* Buttons */
@@ -81,15 +93,29 @@ button{
 
 <body>
 
+<!-- Default audio uses assets/song.mp3; will be replaced if user selects a file -->
 <audio id="bgMusic" loop>
-    <source src="song.mp3" type="audio/mpeg">
+    <source src="assets/song.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
 </audio>
 
 <div class="card">
-    <img src="photo.jpg" class="photo" alt="Ishu">
+    <!-- Default photo uses assets/photo.jpg; will be replaced if user selects a file -->
+    <img src="assets/photo.jpg" class="photo" id="photoImg" alt="Ishu">
     <h2>Ishu, Will You Be My Valentine? 💖</h2>
     <p>You make my world beautiful ❤️</p>
     <p><strong>— Uphar</strong></p>
+
+    <div class="inputs">
+        <label>
+            Change Photo:
+            <input type="file" id="photoInput" accept="image/*">
+        </label>
+        <label>
+            Change Song:
+            <input type="file" id="songInput" accept="audio/*">
+        </label>
+    </div>
 
     <button class="yes" onclick="startLove()">Yes 💘</button>
     <button class="no" id="noBtn">No 😜</button>
@@ -101,13 +127,19 @@ button{
 // NO button move
 const noBtn = document.getElementById("noBtn");
 noBtn.addEventListener("mouseover", () => {
-    noBtn.style.left = Math.random()*window.innerWidth + "px";
-    noBtn.style.top = Math.random()*window.innerHeight + "px";
+    // keep button inside viewport (subtract button size)
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 60);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+    noBtn.style.position = "absolute";
 });
 
 // Start everything on YES
 function startLove(){
-    document.getElementById("bgMusic").play();
+    const bg = document.getElementById("bgMusic");
+    // try to play (may be blocked until user interaction; this is a user click so OK)
+    bg.play().catch(e => console.warn("Autoplay blocked:", e));
     showLyrics();
 }
 
@@ -135,6 +167,42 @@ function showLyrics(){
         i++;
     },3000);
 }
+
+// Photo file input: preview selected image
+const photoInput = document.getElementById("photoInput");
+const photoImg = document.getElementById("photoImg");
+photoInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+    photoImg.src = url;
+    // revoke object URL after image loads to free memory
+    photoImg.onload = () => URL.revokeObjectURL(url);
+});
+
+// Song file input: replace audio source with selected file
+const songInput = document.getElementById("songInput");
+const bgMusic = document.getElementById("bgMusic");
+songInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const url = URL.createObjectURL(file);
+
+    // remove existing sources
+    while(bgMusic.firstChild) bgMusic.removeChild(bgMusic.firstChild);
+
+    const source = document.createElement("source");
+    source.src = url;
+    source.type = file.type || "audio/mpeg";
+    bgMusic.appendChild(source);
+
+    // load and play (user initiated)
+    bgMusic.load();
+    bgMusic.play().catch(err => console.warn("Playback blocked:", err));
+
+    // revoke later when audio unloaded
+    bgMusic.onended = () => URL.revokeObjectURL(url);
+});
 </script>
 
 </body>
